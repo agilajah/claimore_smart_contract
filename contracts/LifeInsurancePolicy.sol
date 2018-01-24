@@ -66,7 +66,7 @@ contract LifeInsurancePolicy is PolicyInvestable {
     uint public writtenPremiumAmount;
     uint32 public lastPolicyDate;
 
-    event Insured(string deviceName, uint insurancePrice);
+    event Insured(string insuredName, uint insurancePrice);
     event Claimed(uint payout); 
     event DividendsPayed(uint date, uint payout); 
 
@@ -76,7 +76,7 @@ contract LifeInsurancePolicy is PolicyInvestable {
     }
 
     struct PolicyData {
-        DeviceData device;
+        InsuredData insured;
         uint endDateTimestamp;
         uint nextPaymentTimestamp;
         uint monthlyPayment;
@@ -90,11 +90,16 @@ contract LifeInsurancePolicy is PolicyInvestable {
     struct InsuredData {
         string userId;
         string insuredName;
-        string insuredAge,
-        bool insuredSmokingStatus,
-        string insuredGender,
-        string insuredHeight,
-        string insuredWeight,
+        string insuredAge;
+        bool insuredSmokingStatus;
+        string insuredGender;
+        string insuredOccupation;
+        string insuredRegion;
+        string insuredNIK;
+        string insuredDeathLetterNumber;
+        string insuredGovernmentLetterNumber;
+        string insuredDeathHospital;
+        string policyNumber;
     }
 
     function LifeInsurancePolicy() payable {
@@ -108,19 +113,13 @@ contract LifeInsurancePolicy is PolicyInvestable {
     }
 
     function setInitialInsuranceParameters() internal {
-        string insuredAge,
-        string insuredSmokingStatus,
-        string insuredGender,
-        string insuredOccupation;
-        string insuredLocation;
-
         // Insured Age upper than
-        insuranceParameters['age']['10'] = 70;
-        insuranceParameters['age']['15'] = 80;
-        insuranceParameters['age']['20'] = 90;
-        insuranceParameters['age']['25'] = 100;
-        insuranceParameters['age']['30'] = 110;
-        insuranceParameters['age']['35'] = 120;
+        insuranceParameters['insuredAge']['10'] = 70;
+        insuranceParameters['insuredAge']['15'] = 80;
+        insuranceParameters['insuredAge']['20'] = 90;
+        insuranceParameters['insuredAge']['25'] = 100;
+        insuranceParameters['insuredAge']['30'] = 110;
+        insuranceParameters['insuredAge']['default'] = 120;
 
         // Insured smoking status
         insuranceParameters['insuredSmokingStatus']['yes'] = 120;
@@ -136,14 +135,13 @@ contract LifeInsurancePolicy is PolicyInvestable {
         insuranceParameters['insuredOccupation']['police'] = 125;
         insuranceParameters['insuredOccupation']['pilot'] = 125;
         insuranceParameters['insuredOccupation']['driver'] = 115;
-        insuranceParameters['insuredOccupation']['entrepreneur'] = 110;
+        insuranceParameters['insuredOccupation']['default'] = 110;
         
 
-        // Insured location
-        insuranceParameters['insuredLocation']['java'] = 100;
-        insuranceParameters['insuredLocation']['sumatra'] = 110;
-        insuranceParameters['insuredLocation']['kalimantan'] = 120;
-        insuranceParameters['insuredLocation']['irian'] = 130;
+        // Insured Region
+        insuranceParameters['insuredRegion']['java'] = 100;
+        insuranceParameters['insuredRegion']['sumatra'] = 110;
+        insuranceParameters['insuredRegion']['default'] = 115;
 
         // Base premium (0.001 ETH)
         basePremium = 1000000000000000;
@@ -160,6 +158,92 @@ contract LifeInsurancePolicy is PolicyInvestable {
         loading = 50;
     }
 
+    // fallback functon not to take ethers
+    function() payable { 
+        throw;
+    }
 
+    // policy part
+    // More parameters should be included
+    function policyPrice(string insuredAge, string insuredSmokingStatus, string insuredGender, string insuredOccupation, string insuredRegion) constant returns(uint price) {
+        // set defaults
+        uint insuredAgeMultiplier = insuranceParameters['insuredAge']['default'];
+        uint insuredSmokingStatusMultiplier = insuranceParameters['insuredSmokingStatus']['no'];
+        uint insuredGenderMultiplier = insuranceParameters['insuredGender']['male'];
+        uint insuredOccupationMultiplier = insuranceParameters['insuredOccupation']['default'];
+        uint insuredRegionMultiplier = insuranceParameters['insuredRegion']['default'];
+
+        if(insuranceParameters['insuredAge'][insuredAge] != 0) {
+            insuredAgeMultiplier = insuranceParameters['insuredAge'][insuredAge];
+        }
+        if(insuranceParameters['insuredSmokingStatus'][insuredSmokingStatus] != 'no') {
+            insuredSmokingStatusMultiplier = insuranceParameters['insuredSmokingStatus'][insuredSmokingStatus];
+        }
+        if(insuranceParameters['insuredGender'][insuredGender] != 'male') {
+            insuredGenderMultiplier = insuranceParameters['insuredGender']['female'];
+        }
+        if(insuranceParameters['insuredOccupation'][insuredOccupation] != 0) {
+            insuredOccupationMultiplier = insuranceParameters['insuredOccupation'][insuredOccupation];
+        }
+        if(insuranceParameters['insuredRegion'][insuredRegion] != 0) {
+            insuredRegionMultiplier = insuranceParameters['insuredRegion'][insuredRegion];
+        }
+
+        // / 100 is due to Solidity not supporting doubles
+        uint riskPremium = basePremium * insuredAgeMultiplier / 100 * insuredSmokingStatusMultiplier / 100 
+                            * insuredGenderMultiplier / 100 * insuredOccupationMultiplier / 100 * insuredRegionMultiplier / 100;
+
+        uint officePremium = riskPremium / (100 - loading) * 100; 
+        return officePremium;
+    }
+
+    function insure(string userId, string insuredName, string insuredAge, bool insuredSmokingStatus, string insuredGender, string insuredOccupation, string insuredRegion, string insuredNIK, string insuredDeathLetterNumber, string insuredGovernmentLetterNumber, string insuredDeathHospital, string policyNumber) payable returns (bool insured) {
+        require(totalInsurers < policiesLimit);
+    
+        uint totalPrice = policyPrice(insuredAge, insuredSmokingStatus, insuredGender, insuredOccupation, insuredRegion);
+        uint monthlyPayment = totalPrice / 12;
+        
+        writtenPremiumAmount += totalPrice; 
+    
+        require(msg.value >= monthlyPayment);
+    
+        var insuredData = InsuredData(userId, insuredName, insuredAge, insuredSmokingStatus, insuredGender, insuredOccupation, insuredRegion, insuredNIK, insuredDeathLetterNumber, insuredGovernmentLetterNumber, insuredDeathHospital, policyNumber);
+        var policy = PolicyData(insuredData, now + 1 years, now + 30 days, monthlyPayment, maxPayout, totalPrice, region, false, false);
+    
+        insurancePolicies[msg.sender] = policy;
+        totalInsurers = totalInsurers + 1;
+        lastPolicyDate = uint32(policy.endDateTimestamp);
+    
+        Insured(insuredName, msg.value);
+        return true;
+    }
+
+    function confirmPolicy(address policyOwner) {
+        require(owner == msg.sender);
+        insurancePolicies[policyOwner].confirmed = true;
+    }
+
+    function claim(string insuredNIK, string insuredDeathLetterNumber, string insuredGovernmentLetterNumber, string insuredDeathHospital, string policyNumber) returns (bool) {
+        var userPolicy = insurancePolicies[msg.sender];
+        var userData = userPolicy.insuredData;
+    
+        if(userData.insuredNIK == insuredNIK && userData.insuredDeathLetterNumber == insuredDeathLetterNumber 
+            && userData.insuredGovernmentLetterNumber == insuredGovernmentLetterNumber && userData.insuredDeathHospital == insuredDeathHospital && userData.policyNumber == policyNumber && userPolicy.endDateTimestamp != 0 && !userPolicy.claimed && userPolicy.endDateTimestamp > now && userPolicy.confirmed) {
+          if(this.balance > userPolicy.maxPayout) {
+            userPolicy.claimed = true;
+            userPolicy.endDateTimestamp = now;
+            userPolicy.nextPaymentTimestamp = 0;
+    
+            totalClaimsPaid = totalClaimsPaid + userPolicy.maxPayout;
+            msg.sender.transfer(userPolicy.maxPayout);
+            Claimed(userPolicy.maxPayout);
+            return true;
+          }
+          // Due to proposed statisticl model in production app this should never happen
+          return false;
+        } else {
+          throw;
+        }
+    }
 
 }
