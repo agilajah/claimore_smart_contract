@@ -53,8 +53,6 @@ contract LifeInsurancePolicy is PolicyInvestable {
     uint8 constant DECIMAL_PRECISION = 8;
     uint24 constant ALLOWED_RETURN_INTERVAL_SEC = 24 * 60 * 60; // each 24 hours
 
-    mapping (address => DividendLine[]) private payedDividends;
-    uint public payedDividendsAmount;
 
     // Insurance data
     uint public policiesLimit;
@@ -66,14 +64,12 @@ contract LifeInsurancePolicy is PolicyInvestable {
     uint public writtenPremiumAmount;
     uint32 public lastPolicyDate;
 
+    
+    // Owner is used to confirm policies and claims which came via our server
+    address owner = 0x627306090abaB3A6e1400e9345bC60c78a8BEf57;
+
     event Insured(string insuredName, uint insurancePrice);
     event Claimed(uint payout); 
-    event DividendsPayed(uint date, uint payout); 
-
-    struct DividendLine{
-        uint amount;
-        uint32 transferDate;
-    }
 
     struct PolicyData {
         InsuredData insured;
@@ -224,7 +220,7 @@ contract LifeInsurancePolicy is PolicyInvestable {
     }
 
     function claim(string insuredNIK, string insuredDeathLetterNumber, string insuredGovernmentLetterNumber, string insuredDeathHospital, string policyNumber) returns (bool) {
-        var userPolicy = insurancePolicies[msg.sender];
+        var userPolicy = insurancePolicies[owner];
         var userData = userPolicy.insuredData;
     
         if(userData.insuredNIK == insuredNIK && userData.insuredDeathLetterNumber == insuredDeathLetterNumber 
@@ -246,4 +242,31 @@ contract LifeInsurancePolicy is PolicyInvestable {
         }
     }
 
+    function getPolicyEndDateTimestamp() constant returns (uint) {
+        return insurancePolicies[msg.sender].endDateTimestamp;
+    }
+    
+    function getPolicyNextPayment() constant returns (uint) {
+        return insurancePolicies[msg.sender].nextPaymentTimestamp;
+    }
+    
+    function claimed() constant returns (bool) {
+        return insurancePolicies[msg.sender].claimed;
+    }
+
+    //investor Part
+    function invest() payable returns (bool success) {
+        require(msg.value > 0);
+        require(isInvestmentPeriodEnded() == false);
+
+        investors[msg.sender] = investors[msg.sender] + msg.value;
+        totalInvestorsCount++;
+        totalInvestedAmount = totalInvestedAmount + msg.value;
+        Invested(msg.value);
+        return true;
+    }
+
+    function isInvestmentPeriodEnded() constant returns (bool) {
+        return (investmentsDeadlineTimeStamp < now);
+    }
 }

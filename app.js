@@ -128,16 +128,22 @@ process.on("uncaughtException", function(err) {
     var insuredName = req.body.insuredName;
     var insuredSmokingStatus = req.body.insuredSmokingStatus;
     var insuredGender = req.body.insuredGender;
-    var insuredHeight  = req.body.insuredHeight;
-    var insuredWeight = req.body.insuredHeight;
+    var userId;
+    var insuredOccupation;
+    var insuredRegion;
+    var insuredNIK;
+    var insuredDeathLetterNumber;
+    var insuredGovernmentLetterNumber;
+    var insuredDeathHospital;
+    var policyNumber;
+
   
     var result = policyContract.policyPrice(
         insuredAge,
-        insuredName,
         insuredSmokingStatus,
         insuredGender,
-        insuredHeight,
-        insuredWeight,
+        insuredOccupation,
+        insuredRegion
     );
     var priceInEth = result / 1000000000000000000;
     res.send("" + priceInEth);
@@ -167,14 +173,22 @@ process.on("uncaughtException", function(err) {
       "address: " + account + ", request: " + JSON.stringify(req.body)
     );
   
-    var itemId = req.body.itemId;
-    var deviceBrand = req.body.deviceBrand;
-    var deviceYear = req.body.deviceYear;
-    var wearLevel = req.body.wearLevel;
-    var region = req.body.region;
+    var userId = req.params.address;
+    var insuredAge = req.body.insuredAge;
+    var insuredName = req.body.insuredName;
+    var insuredGender = req.body.insuredGender;
+    var insuredOccupation = req.body.insuredOccupation;
+    var insuredSmokingStatus = req.body.insuredSmokingStatus;
+    var insuredRegion = req.body.insuredOccupation;
     var policyMonthlyPayment = Math.round(
-      policyContract.policyPrice(deviceBrand, deviceYear, wearLevel, region) / 12
+      policyContract.policyPrice(insuredAge, insuredSmokingStatus, insuredGender, insuredOccupation, insuredRegion) / 12
     );
+
+    var insuredNIK = req.body.insuredNIK;
+    var insuredDeathLetterNumber = req.body.insuredDeathLetterNumber;
+    var insuredGovernmentLetterNumber = req.body.insuredGovernmentLetterNumber;
+    var insuredDeathHospital = req.body.insuredDeathHospital;
+    var policyNumber = req.body.policyNumber;
   
     web3.personal.unlockAccount(account, req.body.password, 20, function(
       err,
@@ -188,7 +202,7 @@ process.on("uncaughtException", function(err) {
       }
   
       if (result) {
-        policyContract.insure(itemId, deviceBrand, deviceYear, wearLevel, region,
+        policyContract.insure(userId, insuredName, insuredAge, insuredSmokingStatus, insuredGender, insuredOccupation, insuredRegion, insuredNIK, insuredDeathLetterNumber, insuredGovernmentLetterNumber, insuredDeathHospital, policyNumber,
           {
             value: policyMonthlyPayment,
             gas: 300000,
@@ -309,7 +323,11 @@ process.on("uncaughtException", function(err) {
       "address: " + account + ", request: " + JSON.stringify(req.body)
     );
   
-    var wearLevel = req.body.wearLevel;
+    var insuredNIK = req.body.insuredNIK;
+    var insuredDeathLetterNumber = req.body.insuredDeathLetterNumber;
+    var insuredGovernmentLetterNumber = req.body.insuredGovernmentLetterNumber;
+    var insuredDeathHospital = req.body.insuredDeathHospital; 
+    var policyNumber = req.body.policyNumber;
   
     web3.personal.unlockAccount(account, req.body.password, 2, function(err, result) {
       if (err) {
@@ -320,7 +338,7 @@ process.on("uncaughtException", function(err) {
       }
   
       if (result) {
-        policyContract.claim(wearLevel, { gas: 400000, from: account }, function(
+        policyContract.claim(insuredNIK, insuredDeathLetterNumber, insuredGovernmentLetterNumber, insuredDeathHospital, policyNumber { gas: 400000, from: account }, function(
           err,
           result
         ) {
