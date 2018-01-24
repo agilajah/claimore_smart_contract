@@ -1,8 +1,41 @@
 pragma solidity ^0.4.17;
 
-import "./stringUtils.sol";
-import "./PolicyInvestable.sol";
-import "./SafeMath.sol";
+
+// import "./PolicyInvestable.sol";
+contract PolicyInvestable {
+    function invest() payable returns (bool success);
+  
+    event Invested(uint value);
+}
+// import "./SafeMath.sol";
+library SafeMath {
+  function mul(uint256 a, uint256 b) internal constant returns (uint256) {
+    uint256 c = a * b;
+    assert(a == 0 || c / a == b);
+    return c;
+  }
+
+  function div(uint256 a, uint256 b) internal constant returns (uint256) {
+    // assert(b > 0); // Solidity automatically throws when dividing by 0
+    uint256 c = a / b;
+    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+    return c;
+  }
+
+  function sub(uint256 a, uint256 b) internal constant returns (uint256) {
+    assert(b <= a);
+    return a - b;
+  }
+
+  function add(uint256 a, uint256 b) internal constant returns (uint256) {
+    uint256 c = a + b;
+    assert(c >= a);
+    return c;
+  }
+}
+
+// import "./stringUtils.sol";
+import { StringUtils } from "./StringUtils.sol";
 
 contract LifeInsurancePolicy is PolicyInvestable { 
     using SafeMath for uint256;

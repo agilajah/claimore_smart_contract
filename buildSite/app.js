@@ -127,10 +127,8 @@ process.on("uncaughtException", function(err) {
     var insuredAge = req.body.insuredAge;
     var insuredName = req.body.insuredName;
     var insuredSmokingStatus = req.body.insuredSmokingStatus;
-    var insuredGender = req.body.insuredGender;
     var userId;
     var insuredOccupation;
-    var insuredRegion;
     var insuredNIK;
     var insuredDeathLetterNumber;
     var insuredGovernmentLetterNumber;
@@ -141,9 +139,7 @@ process.on("uncaughtException", function(err) {
     var result = policyContract.policyPrice(
         insuredAge,
         insuredSmokingStatus,
-        insuredGender,
         insuredOccupation,
-        insuredRegion
     );
     var priceInEth = result / 1000000000000000000;
     res.send("" + priceInEth);
@@ -176,12 +172,10 @@ process.on("uncaughtException", function(err) {
     var userId = req.params.address;
     var insuredAge = req.body.insuredAge;
     var insuredName = req.body.insuredName;
-    var insuredGender = req.body.insuredGender;
     var insuredOccupation = req.body.insuredOccupation;
     var insuredSmokingStatus = req.body.insuredSmokingStatus;
-    var insuredRegion = req.body.insuredOccupation;
     var policyMonthlyPayment = Math.round(
-      policyContract.policyPrice(insuredAge, insuredSmokingStatus, insuredGender, insuredOccupation, insuredRegion) / 12
+      policyContract.policyPrice(insuredAge, insuredSmokingStatus, insuredOccupation) / 12
     );
 
     var insuredNIK = req.body.insuredNIK;
@@ -202,7 +196,7 @@ process.on("uncaughtException", function(err) {
       }
   
       if (result) {
-        policyContract.insure(userId, insuredName, insuredAge, insuredSmokingStatus, insuredGender, insuredOccupation, insuredRegion, insuredNIK, insuredDeathLetterNumber, insuredGovernmentLetterNumber, insuredDeathHospital, policyNumber,
+        policyContract.insure(userId, insuredName, insuredAge, insuredSmokingStatus,  insuredOccupation, insuredNIK, insuredDeathLetterNumber, insuredGovernmentLetterNumber, insuredDeathHospital, policyNumber,
           {
             value: policyMonthlyPayment,
             gas: 300000,

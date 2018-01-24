@@ -1,0 +1,2 @@
+[2018-01-25T00:29:12.137] [INFO] expressLogger - ::1 - - "GET / HTTP/1.1" 200 15 "" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.97 Safari/537.36 Vivaldi/1.94.1008.44"
+[2018-01-25T00:33:51.288] [WARN] expressLogger - ::1 - - "GET / HTTP/1.1" 304 - "" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.97 Safari/537.36 Vivaldi/1.94.1008.44"

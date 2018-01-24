@@ -39,7 +39,7 @@
       "absolutePath": "/D/Repos/repogithub/claimore_smart_contract/contracts/PolicyInvestable.sol",
       "exportedSymbols": {
         "PolicyInvestable": [
-          965
+          806
         ]
       }
     },
@@ -53,9 +53,9 @@
             ".17"
           ]
         },
-        "id": 955,
+        "id": 796,
         "name": "PragmaDirective",
-        "src": "0:24:2"
+        "src": "0:24:1"
       },
       {
         "attributes": {
@@ -69,10 +69,10 @@
           "documentation": null,
           "fullyImplemented": false,
           "linearizedBaseContracts": [
-            965
+            806
           ],
           "name": "PolicyInvestable",
-          "scope": 966
+          "scope": 807
         },
         "children": [
           {
@@ -86,7 +86,7 @@
               ],
               "name": "invest",
               "payable": true,
-              "scope": 965,
+              "scope": 806,
               "stateMutability": "payable",
               "superFunction": null,
               "visibility": "public"
@@ -99,9 +99,9 @@
                   ]
                 },
                 "children": [],
-                "id": 956,
+                "id": 797,
                 "name": "ParameterList",
-                "src": "74:2:2"
+                "src": "74:2:1"
               },
               {
                 "children": [
@@ -109,7 +109,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "success",
-                      "scope": 960,
+                      "scope": 801,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bool",
@@ -122,24 +122,24 @@
                           "name": "bool",
                           "type": "bool"
                         },
-                        "id": 957,
+                        "id": 798,
                         "name": "ElementaryTypeName",
-                        "src": "94:4:2"
+                        "src": "94:4:1"
                       }
                     ],
-                    "id": 958,
+                    "id": 799,
                     "name": "VariableDeclaration",
-                    "src": "94:12:2"
+                    "src": "94:12:1"
                   }
                 ],
-                "id": 959,
+                "id": 800,
                 "name": "ParameterList",
-                "src": "93:14:2"
+                "src": "93:14:1"
               }
             ],
-            "id": 960,
+            "id": 801,
             "name": "FunctionDefinition",
-            "src": "59:49:2"
+            "src": "59:49:1"
           },
           {
             "attributes": {
@@ -154,7 +154,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "value",
-                      "scope": 964,
+                      "scope": 805,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -167,34 +167,34 @@
                           "name": "uint",
                           "type": "uint256"
                         },
-                        "id": 961,
+                        "id": 802,
                         "name": "ElementaryTypeName",
-                        "src": "129:4:2"
+                        "src": "129:4:1"
                       }
                     ],
-                    "id": 962,
+                    "id": 803,
                     "name": "VariableDeclaration",
-                    "src": "129:10:2"
+                    "src": "129:10:1"
                   }
                 ],
-                "id": 963,
+                "id": 804,
                 "name": "ParameterList",
-                "src": "128:12:2"
+                "src": "128:12:1"
               }
             ],
-            "id": 964,
+            "id": 805,
             "name": "EventDefinition",
-            "src": "114:27:2"
+            "src": "114:27:1"
           }
         ],
-        "id": 965,
+        "id": 806,
         "name": "ContractDefinition",
-        "src": "28:116:2"
+        "src": "28:116:1"
       }
     ],
-    "id": 966,
+    "id": 807,
     "name": "SourceUnit",
-    "src": "0:144:2"
+    "src": "0:144:1"
   },
   "compiler": {
     "name": "solc",
@@ -202,5 +202,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-24T18:26:42.692Z"
+  "updatedAt": "2018-01-24T17:27:17.052Z"
 }
