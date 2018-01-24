@@ -1,0 +1,206 @@
+{
+  "contractName": "PolicyInvestable",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "invest",
+      "outputs": [
+        {
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Invested",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.4.17;\r\n\r\ncontract PolicyInvestable {\r\n  function invest() payable returns (bool success);\r\n\r\n  event Invested(uint value);\r\n}",
+  "sourcePath": "D:\\Repos\\repogithub\\claimore_smart_contract\\contracts\\PolicyInvestable.sol",
+  "ast": {
+    "attributes": {
+      "absolutePath": "/D/Repos/repogithub/claimore_smart_contract/contracts/PolicyInvestable.sol",
+      "exportedSymbols": {
+        "PolicyInvestable": [
+          806
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.4",
+            ".17"
+          ]
+        },
+        "id": 796,
+        "name": "PragmaDirective",
+        "src": "0:24:1"
+      },
+      {
+        "attributes": {
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "contract",
+          "documentation": null,
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            806
+          ],
+          "name": "PolicyInvestable",
+          "scope": 807
+        },
+        "children": [
+          {
+            "attributes": {
+              "body": null,
+              "constant": false,
+              "implemented": false,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "invest",
+              "payable": true,
+              "scope": 806,
+              "stateMutability": "payable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 797,
+                "name": "ParameterList",
+                "src": "74:2:1"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "success",
+                      "scope": 801,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 798,
+                        "name": "ElementaryTypeName",
+                        "src": "94:4:1"
+                      }
+                    ],
+                    "id": 799,
+                    "name": "VariableDeclaration",
+                    "src": "94:12:1"
+                  }
+                ],
+                "id": 800,
+                "name": "ParameterList",
+                "src": "93:14:1"
+              }
+            ],
+            "id": 801,
+            "name": "FunctionDefinition",
+            "src": "59:49:1"
+          },
+          {
+            "attributes": {
+              "anonymous": false,
+              "name": "Invested"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": false,
+                      "name": "value",
+                      "scope": 805,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 802,
+                        "name": "ElementaryTypeName",
+                        "src": "129:4:1"
+                      }
+                    ],
+                    "id": 803,
+                    "name": "VariableDeclaration",
+                    "src": "129:10:1"
+                  }
+                ],
+                "id": 804,
+                "name": "ParameterList",
+                "src": "128:12:1"
+              }
+            ],
+            "id": 805,
+            "name": "EventDefinition",
+            "src": "114:27:1"
+          }
+        ],
+        "id": 806,
+        "name": "ContractDefinition",
+        "src": "28:116:1"
+      }
+    ],
+    "id": 807,
+    "name": "SourceUnit",
+    "src": "0:144:1"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "1.0.1",
+  "updatedAt": "2018-01-24T17:27:17.052Z"
+}

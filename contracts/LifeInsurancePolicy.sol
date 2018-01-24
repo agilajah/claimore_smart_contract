@@ -1,41 +1,8 @@
 pragma solidity ^0.4.17;
 
-
-//import "./PolicyInvestable.sol";
-contract PolicyInvestable {
-  function invest() payable returns (bool success);
-
-  event Invested(uint value);
-}
-
-
-//import "./SafeMath.sol";
-
-library SafeMath {
-  function mul(uint256 a, uint256 b) internal constant returns (uint256) {
-    uint256 c = a * b;
-    assert(a == 0 || c / a == b);
-    return c;
-  }
-
-  function div(uint256 a, uint256 b) internal constant returns (uint256) {
-    // assert(b > 0); // Solidity automatically throws when dividing by 0
-    uint256 c = a / b;
-    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-    return c;
-  }
-
-  function sub(uint256 a, uint256 b) internal constant returns (uint256) {
-    assert(b <= a);
-    return a - b;
-  }
-
-  function add(uint256 a, uint256 b) internal constant returns (uint256) {
-    uint256 c = a + b;
-    assert(c >= a);
-    return c;
-  }
-}
+import "./stringUtils.sol";
+import "./PolicyInvestable.sol";
+import "./SafeMath.sol";
 
 contract LifeInsurancePolicy is PolicyInvestable { 
     using SafeMath for uint256;
@@ -63,6 +30,8 @@ contract LifeInsurancePolicy is PolicyInvestable {
     uint loading;
     uint public writtenPremiumAmount;
     uint32 public lastPolicyDate;
+    uint public monthlyPayment;
+    uint public totalPrice;
 
     
     // Owner is used to confirm policies and claims which came via our server
@@ -78,23 +47,24 @@ contract LifeInsurancePolicy is PolicyInvestable {
         uint monthlyPayment;
         uint maxPayout;
         uint totalPrice;
-        string region;
         bool claimed;
         bool confirmed;
     }
 
-    struct InsuredData {
-        string userId;
-        string insuredName;
-        string insuredAge;
-        bool insuredSmokingStatus;
-        string insuredGender;
-        string insuredOccupation;
-        string insuredRegion;
-        string insuredNIK;
+    struct InsuredDeathData {
         string insuredDeathLetterNumber;
         string insuredGovernmentLetterNumber;
         string insuredDeathHospital;
+    }
+
+    struct InsuredData {
+        InsuredDeathData deathData;
+        string userId;
+        string insuredName;
+        string insuredAge;
+        string insuredSmokingStatus;
+        string insuredOccupation;
+        string insuredNIK;
         string policyNumber;
     }
 
@@ -121,9 +91,6 @@ contract LifeInsurancePolicy is PolicyInvestable {
         insuranceParameters['insuredSmokingStatus']['yes'] = 120;
         insuranceParameters['insuredSmokingStatus']['no'] = 100;
 
-        // Insured Gender
-        insuranceParameters['insuredGender']['male'] = 110;
-        insuranceParameters['insuredGender']['female'] = 120;
 
         // Insured Occupation
         insuranceParameters['insuredOccupation']['pilot'] = 125;
@@ -133,11 +100,6 @@ contract LifeInsurancePolicy is PolicyInvestable {
         insuranceParameters['insuredOccupation']['driver'] = 115;
         insuranceParameters['insuredOccupation']['default'] = 110;
         
-
-        // Insured Region
-        insuranceParameters['insuredRegion']['java'] = 100;
-        insuranceParameters['insuredRegion']['sumatra'] = 110;
-        insuranceParameters['insuredRegion']['default'] = 115;
 
         // Base premium (0.001 ETH)
         basePremium = 1000000000000000;
@@ -161,50 +123,39 @@ contract LifeInsurancePolicy is PolicyInvestable {
 
     // policy part
     // More parameters should be included
-    function policyPrice(string insuredAge, string insuredSmokingStatus, string insuredGender, string insuredOccupation, string insuredRegion) constant returns(uint price) {
+    function policyPrice(string insuredAge, string insuredSmokingStatus,  string insuredOccupation) constant returns(uint price) {
         // set defaults
         uint insuredAgeMultiplier = insuranceParameters['insuredAge']['default'];
-        uint insuredSmokingStatusMultiplier = insuranceParameters['insuredSmokingStatus']['no'];
-        uint insuredGenderMultiplier = insuranceParameters['insuredGender']['male'];
+        uint insuredSmokingStatusMultiplier = insuranceParameters['insuredSmokingStatus'][insuredSmokingStatus];
         uint insuredOccupationMultiplier = insuranceParameters['insuredOccupation']['default'];
-        uint insuredRegionMultiplier = insuranceParameters['insuredRegion']['default'];
 
         if(insuranceParameters['insuredAge'][insuredAge] != 0) {
             insuredAgeMultiplier = insuranceParameters['insuredAge'][insuredAge];
         }
-        if(insuranceParameters['insuredSmokingStatus'][insuredSmokingStatus] != 'no') {
-            insuredSmokingStatusMultiplier = insuranceParameters['insuredSmokingStatus'][insuredSmokingStatus];
-        }
-        if(insuranceParameters['insuredGender'][insuredGender] != 'male') {
-            insuredGenderMultiplier = insuranceParameters['insuredGender']['female'];
-        }
         if(insuranceParameters['insuredOccupation'][insuredOccupation] != 0) {
             insuredOccupationMultiplier = insuranceParameters['insuredOccupation'][insuredOccupation];
-        }
-        if(insuranceParameters['insuredRegion'][insuredRegion] != 0) {
-            insuredRegionMultiplier = insuranceParameters['insuredRegion'][insuredRegion];
         }
 
         // / 100 is due to Solidity not supporting doubles
         uint riskPremium = basePremium * insuredAgeMultiplier / 100 * insuredSmokingStatusMultiplier / 100 
-                            * insuredGenderMultiplier / 100 * insuredOccupationMultiplier / 100 * insuredRegionMultiplier / 100;
+                         * insuredOccupationMultiplier / 100;
 
         uint officePremium = riskPremium / (100 - loading) * 100; 
         return officePremium;
     }
-
-    function insure(string userId, string insuredName, string insuredAge, bool insuredSmokingStatus, string insuredGender, string insuredOccupation, string insuredRegion, string insuredNIK, string insuredDeathLetterNumber, string insuredGovernmentLetterNumber, string insuredDeathHospital, string policyNumber) payable returns (bool insured) {
+    function insure(string userId, string insuredName, string insuredAge, string insuredSmokingStatus, string insuredOccupation, string insuredNIK, string insuredDeathLetterNumber, string insuredGovernmentLetterNumber, string insuredDeathHospital, string policyNumber) payable returns (bool insured) {
         require(totalInsurers < policiesLimit);
     
-        uint totalPrice = policyPrice(insuredAge, insuredSmokingStatus, insuredGender, insuredOccupation, insuredRegion);
-        uint monthlyPayment = totalPrice / 12;
+        totalPrice = policyPrice(insuredAge, insuredSmokingStatus, insuredOccupation);
+        monthlyPayment = totalPrice / 12;
         
         writtenPremiumAmount += totalPrice; 
     
         require(msg.value >= monthlyPayment);
     
-        var insuredData = InsuredData(userId, insuredName, insuredAge, insuredSmokingStatus, insuredGender, insuredOccupation, insuredRegion, insuredNIK, insuredDeathLetterNumber, insuredGovernmentLetterNumber, insuredDeathHospital, policyNumber);
-        var policy = PolicyData(insuredData, now + 1 years, now + 30 days, monthlyPayment, maxPayout, totalPrice, region, false, false);
+        var deathData = InsuredDeathData(insuredDeathLetterNumber, insuredGovernmentLetterNumber, insuredDeathHospital);
+        var insuredData = InsuredData(deathData, userId, insuredName, insuredAge, insuredSmokingStatus, insuredOccupation, insuredNIK, policyNumber);
+        var policy = PolicyData(insuredData, now + 1 years, now + 30 days, monthlyPayment, maxPayout, totalPrice, false, false);
     
         insurancePolicies[msg.sender] = policy;
         totalInsurers = totalInsurers + 1;
@@ -221,20 +172,25 @@ contract LifeInsurancePolicy is PolicyInvestable {
 
     function claim(string insuredNIK, string insuredDeathLetterNumber, string insuredGovernmentLetterNumber, string insuredDeathHospital, string policyNumber) returns (bool) {
         var userPolicy = insurancePolicies[owner];
-        var userData = userPolicy.insuredData;
+        var userData = userPolicy.insured;
+        var deathData = userPolicy.insured.deathData;
+        var iNIK = insuredNIK;
+        var iDeathLetterNumber = insuredDeathLetterNumber;
+        var iGovernmentLetterNumber = insuredGovernmentLetterNumber;
+        var iDeathHospital = insuredDeathHospital;
+        var pNumber = policyNumber;
     
-        if(userData.insuredNIK == insuredNIK && userData.insuredDeathLetterNumber == insuredDeathLetterNumber 
-            && userData.insuredGovernmentLetterNumber == insuredGovernmentLetterNumber && userData.insuredDeathHospital == insuredDeathHospital && userData.policyNumber == policyNumber && userPolicy.endDateTimestamp != 0 && !userPolicy.claimed && userPolicy.endDateTimestamp > now && userPolicy.confirmed) {
-          if(this.balance > userPolicy.maxPayout) {
-            userPolicy.claimed = true;
-            userPolicy.endDateTimestamp = now;
-            userPolicy.nextPaymentTimestamp = 0;
-    
-            totalClaimsPaid = totalClaimsPaid + userPolicy.maxPayout;
-            msg.sender.transfer(userPolicy.maxPayout);
-            Claimed(userPolicy.maxPayout);
-            return true;
-          }
+        if(StringUtils.equal(userData.insuredNIK, iNIK) && StringUtils.equal(deathData.insuredDeathLetterNumber, iDeathLetterNumber) && StringUtils.equal(deathData.insuredGovernmentLetterNumber, iGovernmentLetterNumber) && StringUtils.equal(deathData.insuredDeathHospital, iDeathHospital) && StringUtils.equal(userData.policyNumber, pNumber)  && userPolicy.endDateTimestamp != 0 && !userPolicy.claimed && userPolicy.endDateTimestamp > now && userPolicy.confirmed) {
+            if(this.balance > userPolicy.maxPayout) {
+                userPolicy.claimed = true;
+                userPolicy.endDateTimestamp = now;
+                userPolicy.nextPaymentTimestamp = 0;
+        
+                totalClaimsPaid = totalClaimsPaid + userPolicy.maxPayout;
+                msg.sender.transfer(userPolicy.maxPayout);
+                Claimed(userPolicy.maxPayout);
+                return true;
+            }
           // Due to proposed statisticl model in production app this should never happen
           return false;
         } else {

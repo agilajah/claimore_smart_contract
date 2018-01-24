@@ -1,7 +1,7 @@
 // Gulpfile.js
 var gulp = require('gulp'),
-  gutil = require('gulp-util'),
-  clean = require('gulp-clean')
+    gutil = require('gulp-util'),
+    clean = require('gulp-clean')
 
 var dest_folder_build = 'buildSite'
 
