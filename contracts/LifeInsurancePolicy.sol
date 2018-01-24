@@ -89,7 +89,12 @@ contract LifeInsurancePolicy is PolicyInvestable {
 
     struct InsuredData {
         string userId;
-        string name;
+        string insuredName;
+        string insuredAge,
+        bool insuredSmokingStatus,
+        string insuredGender,
+        string insuredHeight,
+        string insuredWeight,
     }
 
     function LifeInsurancePolicy() payable {
@@ -102,6 +107,58 @@ contract LifeInsurancePolicy is PolicyInvestable {
         setInitialInsuranceParameters();
     }
 
+    function setInitialInsuranceParameters() internal {
+        string insuredAge,
+        string insuredSmokingStatus,
+        string insuredGender,
+        string insuredOccupation;
+        string insuredLocation;
+
+        // Insured Age upper than
+        insuranceParameters['age']['10'] = 70;
+        insuranceParameters['age']['15'] = 80;
+        insuranceParameters['age']['20'] = 90;
+        insuranceParameters['age']['25'] = 100;
+        insuranceParameters['age']['30'] = 110;
+        insuranceParameters['age']['35'] = 120;
+
+        // Insured smoking status
+        insuranceParameters['insuredSmokingStatus']['yes'] = 120;
+        insuranceParameters['insuredSmokingStatus']['no'] = 100;
+
+        // Insured Gender
+        insuranceParameters['insuredGender']['male'] = 110;
+        insuranceParameters['insuredGender']['female'] = 120;
+
+        // Insured Occupation
+        insuranceParameters['insuredOccupation']['pilot'] = 125;
+        insuranceParameters['insuredOccupation']['army'] = 125;
+        insuranceParameters['insuredOccupation']['police'] = 125;
+        insuranceParameters['insuredOccupation']['pilot'] = 125;
+        insuranceParameters['insuredOccupation']['driver'] = 115;
+        insuranceParameters['insuredOccupation']['entrepreneur'] = 110;
+        
+
+        // Insured location
+        insuranceParameters['insuredLocation']['java'] = 100;
+        insuranceParameters['insuredLocation']['sumatra'] = 110;
+        insuranceParameters['insuredLocation']['kalimantan'] = 120;
+        insuranceParameters['insuredLocation']['irian'] = 130;
+
+        // Base premium (0.001 ETH)
+        basePremium = 1000000000000000;
+
+        // Max payout (0.01 ETH)
+        maxPayout = 10000000000000000;
+        
+        investmentsLimit = 1000000000000000000000; //1000 ETH
+        investmentsDeadlineTimeStamp = uint32(now) + 90 days;
+        lastPolicyDate = uint32(now) + 90 days;
+        policiesLimit = 10000;
+
+        // Loading percentage (expenses, etc)
+        loading = 50;
+    }
 
 
 

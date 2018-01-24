@@ -124,16 +124,20 @@ process.on("uncaughtException", function(err) {
   });
 
   app.post("/insurancePrice/:address", function(req, res) {
-    var deviceBrand = req.body.deviceBrand;
-    var deviceYear = req.body.deviceYear;
-    var wearLevel = req.body.wearLevel;
-    var region = req.body.region;
+    var insuredAge = req.body.insuredAge;
+    var insuredName = req.body.insuredName;
+    var insuredSmokingStatus = req.body.insuredSmokingStatus;
+    var insuredGender = req.body.insuredGender;
+    var insuredHeight  = req.body.insuredHeight;
+    var insuredWeight = req.body.insuredHeight;
   
     var result = policyContract.policyPrice(
-      deviceBrand,
-      deviceYear,
-      wearLevel,
-      region
+        insuredAge,
+        insuredName,
+        insuredSmokingStatus,
+        insuredGender,
+        insuredHeight,
+        insuredWeight,
     );
     var priceInEth = result / 1000000000000000000;
     res.send("" + priceInEth);
@@ -340,7 +344,7 @@ process.on("uncaughtException", function(err) {
   });
   
   app.get("/", function(req, res) {
-    res.send("Welcome to API. Specs can be found: ");
+    res.send("Welcome to API.");
   });
   
   app.listen(process.env.PORT || 3000, function() {
